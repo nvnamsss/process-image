@@ -20,7 +20,7 @@ def Erosion(image, filt, centerRow, centerColumn):
 
     for loop in range(0, hi):
         for loop2 in range(0, wi):
-             clone = GetShapes(image, filt, loop, loop2, centerRow, centerColumn)
+             clone = GetShapes(image, filt, loop, loop2, centerRow, centerColumn, 255)
              buffer[loop,loop2] = np.amin(clone)
     
     return buffer
@@ -39,7 +39,7 @@ def Dilation(image, filt, centerRow, centerColumn):
 
     for loop in range(0, hi):
         for loop2 in range(0, wi):
-             clone = GetShapes(image, filt, loop, loop2, centerRow, centerColumn)
+             clone = GetShapes(image, filt, loop, loop2, centerRow, centerColumn, 0)
              buffer[loop,loop2] = np.amax(clone)
     
     return buffer
@@ -54,7 +54,7 @@ def Closing(image, filt, centerRow, centerColumn):
     image2 = Erosion(image2, filt, 1, 1)
     return image2
 
-def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
+def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn, default):
     buffer = child.copy()
     hp = parent.shape[0]
     wp = parent.shape[1]
@@ -64,13 +64,13 @@ def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
     for loop in range(0, hc):
         for loop2 in range(0, wc):
             if atRow - (centerRow - loop) < 0 or atRow + (loop - centerRow) >= hp or atColumn - (centerColumn - loop2) < 0 or atColumn + (loop2 - centerColumn) >= wp:
-                buffer[loop,loop2] = 255
+                buffer[loop,loop2] = default
                 continue
 
             if child[loop, loop2] == 1:
                 buffer[loop,loop2] = parent[atRow - (centerRow - loop), atColumn - (centerColumn - loop2)]
             else:
-                buffer[loop,loop2] = 255
+                buffer[loop,loop2] = default
 
     return buffer
 def test_erosion():
