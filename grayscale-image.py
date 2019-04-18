@@ -1,10 +1,9 @@
 import cv2
 import numpy as np
+import sys
 
 def GetGrayScaleImage(path):
     img = cv2.imread(path, 0)
-    cv2.imshow("", img)
-    cv2.waitKey(0)
     return img
 
 def Erosion(image, filt, centerRow, centerColumn):
@@ -46,13 +45,11 @@ def Dilation(image, filt, centerRow, centerColumn):
     return buffer
 
 def Opening(image, filt, centerRow, centerColumn):
-    image = GetBinaryImage("image.jpg", 128)
     image2 = Erosion(image, filt, 1, 1)
     image2 = Dilation(image2, filt, 1, 1)
     return image2
 
 def Closing(image, filt, centerRow, centerColumn):
-    image = GetBinaryImage("image.jpg", 128)
     image2 = Dilation(image, filt, 1, 1)
     image2 = Erosion(image2, filt, 1, 1)
     return image2
@@ -64,17 +61,9 @@ def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
     hc = child.shape[0]
     wc = child.shape[1]
 
-    boundH = atRow - centerRow
-    boundW = atColumn - centerColumn
-    
-    if atRow - centerRow < 0 or atColumn - centerColumn < 0 or atRow + (hc - centerRow) >= hp or atColumn + (wc - centerColumn) >= wp:
-        print('atRow {0} atColumn {1} centerRow {2} centerColumn {3} hp {4} wp {5} hc {6} wc {7}'.format(atRow, atColumn, centerRow, centerColumn, hp, wp, hc, wc))
-        return np.array([])
-
     for loop in range(0, hc):
         for loop2 in range(0, wc):
-            if atRow - (centerRow - loop) < 0 or atRow + (loop - centerRow) > hp
-                 or atColumn - (centerColumn - loop2) < 0 or atColumn + (loop2 - centerColumn) > wp:
+            if atRow - (centerRow - loop) < 0 or atRow + (loop - centerRow) >= hp or atColumn - (centerColumn - loop2) < 0 or atColumn + (loop2 - centerColumn) >= wp:
                 buffer[loop,loop2] = 255
                 continue
 
@@ -84,14 +73,59 @@ def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
                 buffer[loop,loop2] = 255
 
     return buffer
+def test_erosion():
+    filt = 	np.asarray([[0, 1, 0],
+                [1, 1, 1],
+                [0, 1, 0]])
+
+    image = GetGrayScaleImage("image.jpg")
+    image2 = Erosion(image, filt, 1, 1)
+    cv2.imwrite("image-erosion.jpg", image2)
+    cv2.imwrite("image-binary.jpg", image)
+    print("white count before: ", cv2.countNonZero(image))
+    print("white count after: ", cv2.countNonZero(image2))
+
+def test_dilation():
+    filt = 	np.asarray([[1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]])
+
+    image = GetGrayScaleImage("image.jpg")
+    image2 = Dilation(image, filt, 1, 1)
+    cv2.imwrite("image-dilation.jpg", image2)
+    cv2.imwrite("image-binary.jpg", image)
+    print("white count before: ", cv2.countNonZero(image))
+    print("white count after: ", cv2.countNonZero(image2))
+
+def test_opening():
+    filt = 	np.asarray([[1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]])
+    image = GetGrayScaleImage("image.jpg")
+    image2 = Opening(image, filt, 1, 1)
+    cv2.imwrite("image-opening.jpg", image2)
+    cv2.imwrite("image-binary.jpg", image)
+    print("white count before: ", cv2.countNonZero(image))
+    print("white count after: ", cv2.countNonZero(image2))
+
+def test_closing():
+    filt = 	np.asarray([[1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]])
+    image = GetGrayScaleImage("image.jpg")
+    image2 = Closing(image, filt, 1, 1)
+    cv2.imwrite("image-closing.jpg", image2)
+    cv2.imwrite("image-binary.jpg", image)
+    print("white count before: ", cv2.countNonZero(image))
+    print("white count after: ", cv2.countNonZero(image2))
 
 def main():
     task = sys.argv[1]
-    if task == "opening"
+    if task == "opening":
         test_opening()
         return
     
-    if task == "closing"
+    if task == "closing":
         test_closing()
         return
 
@@ -102,5 +136,6 @@ def main():
     if task == "dilation":
         test_dilation()
         return
+
+main()
         
-GetGrayScaleImage("image.jpg")

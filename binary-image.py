@@ -161,4 +161,9 @@ def main():
         test_dilation()
         return
 
+    test_erosion()
+    test_dilation()
+    test_opening()
+    test_closing()
+
 main()
