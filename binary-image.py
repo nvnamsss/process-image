@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import sys
 
 def GetBinaryImage(path, threshold):
     img = cv2.imread(path, 0)
@@ -71,19 +72,13 @@ def Opening(image, filt, centerRow, centerColumn):
     image = GetBinaryImage("image.jpg", 128)
     image2 = Erosion(image, filt, 1, 1)
     image2 = Dilation(image2, filt, 1, 1)
-    cv2.imwrite("image-opening.jpg", image2)
-    cv2.imwrite("image-binary.jpg", image)
-    print("white count before: ", cv2.countNonZero(image))
-    print("white count after: ", cv2.countNonZero(image2))
+    return image2
 
 def Closing(image, filt, centerRow, centerColumn):
     image = GetBinaryImage("image.jpg", 128)
     image2 = Dilation(image, filt, 1, 1)
     image2 = Erosion(image2, filt, 1, 1)
-    cv2.imwrite("image-closing.jpg", image2)
-    cv2.imwrite("image-binary.jpg", image)
-    print("white count before: ", cv2.countNonZero(image))
-    print("white count after: ", cv2.countNonZero(image2))
+    return image2
 
 def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
     buffer = child.copy()
@@ -126,4 +121,44 @@ def test_dilation():
     print("white count before: ", cv2.countNonZero(image))
     print("white count after: ", cv2.countNonZero(image2))
 
-test_dilation()
+def test_opening():
+    filt = 	np.asarray([[1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]])
+    image = GetBinaryImage("image.jpg", 128)
+    image2 = Opening(image, filt, 1, 1)
+    cv2.imwrite("image-opening.jpg", image2)
+    cv2.imwrite("image-binary.jpg", image)
+    print("white count before: ", cv2.countNonZero(image))
+    print("white count after: ", cv2.countNonZero(image2))
+
+def test_closing():
+    filt = 	np.asarray([[1, 1, 1],
+                [1, 1, 1],
+                [1, 1, 1]])
+    image = GetBinaryImage("image.jpg", 128)
+    image2 = Closing(image, filt, 1, 1)
+    cv2.imwrite("image-closing.jpg", image2)
+    cv2.imwrite("image-binary.jpg", image)
+    print("white count before: ", cv2.countNonZero(image))
+    print("white count after: ", cv2.countNonZero(image2))
+
+def main():
+    task = sys.argv[1]
+    if task == "opening"
+        test_opening()
+        return
+    
+    if task == "closing"
+        test_closing()
+        return
+
+    if task == "erosion":
+        test_erosion()
+        return
+
+    if task == "dilation":
+        test_dilation()
+        return
+
+main()
