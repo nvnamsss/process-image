@@ -3,12 +3,16 @@ import numpy as np
 import sys
 
 def GetBinaryImage(path, threshold):
+    #read image as a grayscale
     img = cv2.imread(path, 0)
+    #convert grayscale image into binary image
     (thresh, img_binary) = cv2.threshold(img, threshold, 255, cv2.THRESH_BINARY)
     return img_binary
 
 def Erosion(image, filt, centerRow, centerColumn):
+    #create clone of image
     buffer = image.copy()
+    #get shapes of image and filter
     hi = image.shape[0]
     wi = image.shape[1]
     hf = filt.shape[0]
@@ -19,23 +23,27 @@ def Erosion(image, filt, centerRow, centerColumn):
     print("filt height: ", hf)
     print("filt width: ", wf)
 
+    #iterate all pixels
     for loop in range(0, hi):
         for loop2 in range(0, wi):
-            # print(image[loop,loop2])
+            
             if image[loop,loop2] == 0:
                 isClear = False
                 clone = GetShapes(image, filt, loop, loop2, centerRow, centerColumn)
                 #print(type(clone))
+                #is clone is empty?
                 if clone.shape[0] == 0:
                     buffer[loop, loop2] = 255
                     continue
 
+                #compare clone and filter
                 for loop3 in range(0, hf):
                     for loop4 in range(0, wf):
                         if clone[loop3,loop4] != filt[loop3,loop4]:
                             isClear = True
                             break
 
+                #clone is different to filter
                 if isClear:
                     buffer[loop,loop2] = 255
 
@@ -59,6 +67,7 @@ def Dilation(image, filt, centerRow, centerColumn):
             if image[loop,loop2] == 0:
                 clone = GetShapes(image, filt, loop, loop2, centerRow, centerColumn)
                 #print(type(clone))
+                #is clone is empty?
                 if clone.shape[0] == 0:
                     continue
 
@@ -80,6 +89,13 @@ def Closing(image, filt, centerRow, centerColumn):
     image2 = Erosion(image2, filt, 1, 1)
     return image2
 
+#GetShapes will return a part of parent which is:
+# same size with child
+# center is child's center
+#Params: 
+# parent, child: equalizer image and filter
+# atRow, atColumn: location of pixel
+# centerRow, centerColumn: center of filter
 def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
     buffer = child.copy()
     hp = parent.shape[0]
@@ -87,10 +103,12 @@ def GetShapes(parent, child, atRow, atColumn, centerRow, centerColumn):
     hc = child.shape[0]
     wc = child.shape[1]
     
+    #checking if out of bound
     if atRow - centerRow < 0 or atColumn - centerColumn < 0 or atRow + (hc - centerRow) >= hp or atColumn + (wc - centerColumn) >= wp:
         print('atRow {0} atColumn {1} centerRow {2} centerColumn {3} hp {4} wp {5} hc {6} wc {7}'.format(atRow, atColumn, centerRow, centerColumn, hp, wp, hc, wc))
         return np.array([])
 
+    #else copy parent into buffer
     for loop in range(0, hc):
         for loop2 in range(0, wc):
             buffer[loop,loop2] = parent[atRow - (centerRow - loop), atColumn - (centerColumn - loop2)]
@@ -144,22 +162,23 @@ def test_closing():
     print("white count after: ", cv2.countNonZero(image2))
 
 def main():
-    task = sys.argv[1]
-    if task == "opening"
-        test_opening()
-        return
-    
-    if task == "closing"
-        test_closing()
-        return
+    if len(sys.argv) > 2:
+        task = sys.argv[1]
+        if task == "opening"
+            test_opening()
+            return
+        
+        if task == "closing"
+            test_closing()
+            return
 
-    if task == "erosion":
-        test_erosion()
-        return
+        if task == "erosion":
+            test_erosion()
+            return
 
-    if task == "dilation":
-        test_dilation()
-        return
+        if task == "dilation":
+            test_dilation()
+            return
 
     test_erosion()
     test_dilation()
